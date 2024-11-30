@@ -34,10 +34,7 @@
 		"svelte": "^5.0.0"
 	},
 	"dependencies": {
-		"@sveltejs/adapter-auto": "^3.3.1",
 		"@sveltejs/kit": "^2.9.0",
-		"@sveltejs/package": "^2.3.7",
-		"@sveltejs/vite-plugin-svelte": "^5.0.1",
 		"feed": "^4.2.2",
 		"globals": "^15.12.0",
 		"isomorphic-git": "^1.27.2",
@@ -56,6 +53,9 @@
 		"prettier-plugin-svelte": "^3.3.2",
 		"typescript": "^5.7.2",
 		"typescript-eslint": "^8.16.0",
+		"@sveltejs/package": "^2.3.7",
+		"@sveltejs/vite-plugin-svelte": "^5.0.1",
+		"@sveltejs/adapter-auto": "^3.3.1",
 		"vite": "^6.0.1",
 		"semantic-release": "^24.2.0",
 		"@types/node": "^22.10.1",
