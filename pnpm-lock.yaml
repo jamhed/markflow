@@ -7,7 +7,7 @@ settings:
 importers:
 
   .:
-    devDependencies:
+    dependencies:
       '@sveltejs/adapter-auto':
         specifier: ^3.3.1
         version: 3.3.1(@sveltejs/kit@2.9.0(@sveltejs/vite-plugin-svelte@5.0.1(svelte@5.2.11)(vite@6.0.1(@types/node@22.10.1)))(svelte@5.2.11)(vite@6.0.1(@types/node@22.10.1)))
@@ -20,21 +20,6 @@ importers:
       '@sveltejs/vite-plugin-svelte':
         specifier: ^5.0.1
         version: 5.0.1(svelte@5.2.11)(vite@6.0.1(@types/node@22.10.1))
-      '@types/js-yaml':
-        specifier: ^4.0.9
-        version: 4.0.9
-      '@types/node':
-        specifier: ^22.10.1
-        version: 22.10.1
-      eslint:
-        specifier: ^9.16.0
-        version: 9.16.0
-      eslint-config-prettier:
-        specifier: ^9.1.0
-        version: 9.1.0(eslint@9.16.0)
-      eslint-plugin-svelte:
-        specifier: ^2.46.1
-        version: 2.46.1(eslint@9.16.0)(svelte@5.2.11)
       feed:
         specifier: ^4.2.2
         version: 4.2.2
@@ -53,18 +38,9 @@ importers:
       pino:
         specifier: ^9.5.0
         version: 9.5.0
-      prettier:
-        specifier: ^3.4.1
-        version: 3.4.1
-      prettier-plugin-svelte:
-        specifier: ^3.3.2
-        version: 3.3.2(prettier@3.4.1)(svelte@5.2.11)
       publint:
         specifier: ^0.2.12
         version: 0.2.12
-      semantic-release:
-        specifier: ^24.2.0
-        version: 24.2.0(typescript@5.7.2)
       shiki:
         specifier: ^1.24.0
         version: 1.24.0
@@ -77,6 +53,31 @@ importers:
       svelte-check:
         specifier: ^4.1.0
         version: 4.1.0(svelte@5.2.11)(typescript@5.7.2)
+    devDependencies:
+      '@types/js-yaml':
+        specifier: ^4.0.9
+        version: 4.0.9
+      '@types/node':
+        specifier: ^22.10.1
+        version: 22.10.1
+      eslint:
+        specifier: ^9.16.0
+        version: 9.16.0
+      eslint-config-prettier:
+        specifier: ^9.1.0
+        version: 9.1.0(eslint@9.16.0)
+      eslint-plugin-svelte:
+        specifier: ^2.46.1
+        version: 2.46.1(eslint@9.16.0)(svelte@5.2.11)
+      prettier:
+        specifier: ^3.4.1
+        version: 3.4.1
+      prettier-plugin-svelte:
+        specifier: ^3.3.2
+        version: 3.3.2(prettier@3.4.1)(svelte@5.2.11)
+      semantic-release:
+        specifier: ^24.2.0
+        version: 24.2.0(typescript@5.7.2)
       typescript:
         specifier: ^5.7.2
         version: 5.7.2
