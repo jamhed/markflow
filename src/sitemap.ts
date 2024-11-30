@@ -1,6 +1,7 @@
-import { building } from '$app/environment';
 import * as fs from 'fs/promises';
 import type { Meta } from './meta.js';
+
+let building = false;
 
 export const writeFeedEntry = async (url: URL, meta: Partial<Meta>) => {
   if (building) {

@@ -1,7 +1,6 @@
 import * as fs from 'fs/promises';
 import Path, { join } from 'path';
 
-import { Marked } from 'marked';
 import { CodeProcessor } from './code.js';
 import { getFileMeta, getFiles, getFilesRecursively, getFolders, makeSlug } from './files.js';
 import { getGitMeta } from './git.js';
@@ -75,8 +74,10 @@ export async function getFolderMeta(path: string, folder: string) {
   };
 }
 
-export function markedInstance(): Marked {
-  return new Marked();
+const processors: Processor[] = [new MetaProcessor(), new CodeProcessor()];
+
+export function addProcessor(p: Processor) {
+  processors.push(p);
 }
 
 export async function parser(fileName: string, processors: Processor[] = []): Promise<Content> {
@@ -97,5 +98,5 @@ export async function readMarkdown(fileName: string) {
 }
 
 export async function parseMarkdown(fileName: string) {
-  return parser(fileName, [new MetaProcessor(), new CodeProcessor()]);
+  return parser(fileName, processors);
 }

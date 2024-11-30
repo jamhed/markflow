@@ -1,43 +1,19 @@
 import { Marked, type MarkedExtension, type Token, type Tokens } from 'marked';
-import { markedInstance } from './parser.js';
 
 export type Dispatch = Promise<void | boolean | Token>;
 
-export class ProcessorChain {
-  meta: Record<string, any>;
-  processors: Processor[];
-  options: MarkedExtension[];
-  constructor(...processors: Processor[]) {
-    this.meta = {};
-    this.processors = processors;
-    this.options = [];
+const extensions: MarkedExtension[] = [];
+
+export function addDirective(e: MarkedExtension) {
+  extensions.push(e);
+}
+
+function markedInstance() {
+  const marked = new Marked();
+  for (let d of extensions) {
+    marked.use(d);
   }
-  use(options: MarkedExtension) {
-    this.options.push(options);
-    return this;
-  }
-  parse(text: string, options: MarkedExtension = {}) {
-    return this.marked().use(options).parse(text);
-  }
-  marked() {
-    const marked = markedInstance().use({
-      async: true,
-      hooks: { processAllTokens: async (tokens: Token[]) => await this.processAllTokens(tokens) }
-    });
-    for (const option of this.options) {
-      marked.use(option);
-    }
-    return marked;
-  }
-  async processAllTokens(tokens: Token[]): Promise<Token[]> {
-    for (const processor of this.processors) {
-      tokens = await processor.processAllTokens(tokens);
-      if (processor.meta) {
-        this.meta = { ...this.meta, ...processor.meta };
-      }
-    }
-    return tokens;
-  }
+  return marked;
 }
 
 export class Processor {
@@ -67,8 +43,8 @@ export class Processor {
         result.push(token);
         continue;
       }
+      if (!re) continue;
       if (typeof re === 'boolean') {
-        if (!re) continue;
         if (this.isGenericToken(token) && token.tokens) {
           token.tokens = await this.processAllTokens(token.tokens);
         }
@@ -115,4 +91,41 @@ export class Processor {
   async br(_token: Tokens.Br): Dispatch {}
   async del(_token: Tokens.Del): Dispatch {}
   async generic(_token: Tokens.Generic): Dispatch {}
+}
+
+export class ProcessorChain {
+  meta: Record<string, any>;
+  processors: Processor[];
+  options: MarkedExtension[];
+  constructor(...processors: Processor[]) {
+    this.meta = {};
+    this.processors = processors;
+    this.options = [];
+  }
+  use(options: MarkedExtension) {
+    this.options.push(options);
+    return this;
+  }
+  parse(text: string, options: MarkedExtension = {}) {
+    return this.marked().use(options).parse(text);
+  }
+  marked() {
+    const marked = markedInstance().use({
+      async: true,
+      hooks: { processAllTokens: async (tokens: Token[]) => await this.processAllTokens(tokens) }
+    });
+    for (const option of this.options) {
+      marked.use(option);
+    }
+    return marked;
+  }
+  async processAllTokens(tokens: Token[]): Promise<Token[]> {
+    for (const processor of this.processors) {
+      tokens = await processor.processAllTokens(tokens);
+      if (processor.meta) {
+        this.meta = { ...this.meta, ...processor.meta };
+      }
+    }
+    return tokens;
+  }
 }
