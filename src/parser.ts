@@ -74,9 +74,9 @@ export async function getFolderMeta(path: string, folder: string) {
   };
 }
 
-const processors: Processor[] = [new MetaProcessor(), new CodeProcessor()];
+const processors: any[] = [() => new MetaProcessor(), () => new CodeProcessor()];
 
-export function addProcessor(p: Processor) {
+export function addProcessor(p: any) {
   processors.push(p);
 }
 
@@ -98,5 +98,9 @@ export async function readMarkdown(fileName: string) {
 }
 
 export async function parseMarkdown(fileName: string) {
-  return parser(fileName, processors);
+  console.log(processors.map((p) => p()));
+  return parser(
+    fileName,
+    processors.map((p) => p())
+  );
 }
