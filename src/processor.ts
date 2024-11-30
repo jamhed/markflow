@@ -1,10 +1,24 @@
-import { Marked, type MarkedExtension, type Token, type Tokens } from 'marked';
+import {
+  Marked,
+  type MarkedExtension,
+  type Token,
+  type TokenizerExtension,
+  type Tokens
+} from 'marked';
+
+export { type TokenizerExtension, type Token } from 'marked';
 
 export type Dispatch = Promise<void | boolean | Token>;
 
-const extensions: MarkedExtension[] = [];
+export interface MarkedDirective {
+  extensions: TokenizerExtension[];
+  query(token: any): Promise<void>;
+  walkTokens(token: Token): Promise<void>;
+}
 
-export function addDirective(e: MarkedExtension) {
+const extensions: MarkedDirective[] = [];
+
+export function addDirective(e: MarkedDirective) {
   extensions.push(e);
 }
 
