@@ -76,7 +76,7 @@ export async function getFolderMeta(path: string, folder: string) {
 }
 
 export function markedInstance(): Marked {
-  return new Marked().use(new RouteDirective()).use(new CarDirective()).use(new PoiDirective());
+  return new Marked();
 }
 
 export async function parser(fileName: string, processors: Processor[] = []): Promise<Content> {

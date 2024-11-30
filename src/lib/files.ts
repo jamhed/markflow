@@ -1,6 +1,6 @@
 import * as fs from 'fs/promises';
 import Path from 'path';
-import logger from './logger';
+import logger from './logger.js';
 
 export async function getFileMeta(filePath: string) {
   const stats = await fs.stat(filePath);
