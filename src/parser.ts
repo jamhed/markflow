@@ -2,7 +2,7 @@ import * as fs from 'fs/promises';
 import Path, { join } from 'path';
 
 import { CodeProcessor } from './code.js';
-import { getFileMeta, getFiles, getFilesRecursively, getFolders, makeSlug } from './files.js';
+import { getFileMeta, getFiles, getFolders, makeSlug } from './files.js';
 import { getGitMeta } from './git.js';
 import { createLinker } from './links.js';
 import logger from './logger.js';
@@ -25,7 +25,7 @@ export async function listPages(path: string) {
 }
 
 export async function listPagesRecursively(path: string) {
-  const filteredPaths = (await getFilesRecursively(path))
+  const filteredPaths = (await getFiles(path, true))
     .filter((file) => file.endsWith('.md'))
     .filter((file) => !Path.basename(file).startsWith('_'));
   const pages = await Promise.all(filteredPaths.map(async (file) => await readMarkdown(file)));
@@ -98,7 +98,6 @@ export async function readMarkdown(fileName: string) {
 }
 
 export async function parseMarkdown(fileName: string) {
-  console.log(processors.map((p) => p()));
   return parser(
     fileName,
     processors.map((p) => p())

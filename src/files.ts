@@ -18,41 +18,24 @@ export function makeSlug(filePath: string, baseDir: string): string {
   return slug;
 }
 
-export async function getFilesRecursively(path: string) {
-  try {
-    const files: string[] = [];
-    const pathFiles = await fs.readdir(path);
-    for (const file of pathFiles) {
-      const fullPath = Path.join(path, file);
-      const stats = await fs.stat(fullPath);
-      if (stats.isDirectory()) {
-        const subFiles = await getFiles(fullPath);
-        files.push(...subFiles);
-      } else {
-        files.push(fullPath);
-      }
-    }
-    return files;
-  } catch (e) {
-    logger.error(e, 'getFilesRecursively');
-    return [];
-  }
-}
-
-export async function getFiles(path: string) {
+export async function getFiles(path: string, recursive: boolean = false) {
   const files: string[] = [];
   try {
     const pathFiles = await fs.readdir(path);
     for (const file of pathFiles) {
       const fullPath = Path.join(path, file);
       const stats = await fs.stat(fullPath);
-      if (stats.isFile()) files.push(fullPath);
+      if (recursive && stats.isDirectory()) {
+        const subFiles = await getFiles(fullPath, recursive);
+        files.push(...subFiles);
+      } else {
+        files.push(fullPath);
+      }
     }
-    return files;
   } catch (e) {
     logger.error(e, 'getFiles');
-    return [];
   }
+  return files;
 }
 
 export async function getFolders(path: string) {
