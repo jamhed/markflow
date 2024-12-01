@@ -16,16 +16,8 @@ export interface Content {
 
 const mapper = (page: any) => page.meta.created_ts;
 
-export async function listPages(path: string) {
-  const filteredPaths = (await getFiles(path))
-    .filter((file) => file.endsWith('.md'))
-    .filter((file) => !Path.basename(file).startsWith('_'));
-  const pages = await Promise.all(filteredPaths.map(async (file) => await readMarkdown(file)));
-  return pages.sort((a, b) => mapper(b) - mapper(a)).filter((page) => !page.meta.skip);
-}
-
-export async function listPagesRecursively(path: string) {
-  const filteredPaths = (await getFiles(path, true))
+export async function listPages(path: string, recursive: boolean = false) {
+  const filteredPaths = (await getFiles(path, recursive))
     .filter((file) => file.endsWith('.md'))
     .filter((file) => !Path.basename(file).startsWith('_'));
   const pages = await Promise.all(filteredPaths.map(async (file) => await readMarkdown(file)));
