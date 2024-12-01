@@ -20,7 +20,7 @@ export async function listPages(path: string, recursive: boolean = false) {
   const filteredPaths = (await getFiles(path, recursive))
     .filter((file) => file.endsWith('.md'))
     .filter((file) => !Path.basename(file).startsWith('_'));
-  const pages = await Promise.all(filteredPaths.map(async (file) => await readMarkdown(file)));
+  const pages = await Promise.all(filteredPaths.map(async (file) => await readMeta(file)));
   return pages.sort((a, b) => mapper(b) - mapper(a)).filter((page) => !page.meta.skip);
 }
 
@@ -46,7 +46,7 @@ export const makeFolderParts = (slug: string): FolderPart[] => {
 export async function getFolderMeta(path: string, folder: string) {
   let meta: Partial<Meta> = {};
   try {
-    const re = await readMarkdown(Path.join(path, folder, '_index.md'));
+    const re = await readMeta(Path.join(path, folder, '_index.md'));
     meta = re.meta;
   } catch (e) {
     logger.error(e, 'error reading folder meta');
@@ -85,7 +85,7 @@ export async function parser(fileName: string, processors: Processor[] = []): Pr
   return { html, meta: { parts: makeFolderParts(slug), ...fileMeta, ...chain.meta } };
 }
 
-export async function readMarkdown(fileName: string) {
+export async function readMeta(fileName: string) {
   return parser(fileName, [new MetaProcessor()]);
 }
 
