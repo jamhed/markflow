@@ -24,6 +24,7 @@ export interface Meta extends FileMeta {
   hero?: boolean;
   parts?: FolderPart[];
   description?: string;
+  folder?: boolean;
 }
 
 export interface Options {
