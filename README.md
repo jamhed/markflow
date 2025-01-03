@@ -24,6 +24,7 @@ title?: string; // see below
 description?: string; // see below
 skip?: boolean; // flag to ignore file (for drafts)
 hero?: boolean; // flag to include file into top
+folder?: boolean; // flag to indicate folder view
 ```
 
 Fields like `created`, `modified` and `author` are populated from git.
