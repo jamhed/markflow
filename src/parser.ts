@@ -6,6 +6,9 @@ import { MetaProcessor, type PathPart, type DocumentMeta } from './meta.js';
 import { ProcessorChain } from './processor.js';
 import { type Stats } from 'fs';
 import { CodeProcessor } from './code.js';
+import logger from './logger.js';
+
+const cacheStore: { [key: string]: Content } = {};
 
 export interface ContentMeta extends DocumentMeta {
   [key: string]: any;
@@ -53,6 +56,10 @@ export async function listContent(path: string, recursive: boolean = false) {
 }
 
 export async function readContent(entry: FSEntry, recursive: boolean = false): Promise<Content> {
+  if (cacheStore[entry.path]) {
+    return cacheStore[entry.path];
+  }
+  logger.info({ path: entry.path }, 'reading');
   const content = await readEntryContent(entry);
   const chain = new ProcessorChain(...processors.map((p) => p()));
   const html = await chain.parse(content);
@@ -65,5 +72,7 @@ export async function readContent(entry: FSEntry, recursive: boolean = false): P
     ...chain.meta
   };
   const pages = entry.stats.isDirectory() ? await listContent(entry.path, recursive) : [];
-  return { html, meta, pages };
+  const re = { html, meta, pages };
+  cacheStore[entry.path] = re;
+  return re;
 }
