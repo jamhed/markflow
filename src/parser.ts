@@ -55,12 +55,20 @@ export async function listContent(path: string, recursive: boolean = false) {
   return pages.sort((a, b) => createdTs(b) - createdTs(a)).filter((page) => !page.meta.skip);
 }
 
-export async function readContent(entry: FSEntry, recursive: boolean = false): Promise<Content> {
+export async function readContentCached(
+  entry: FSEntry,
+  recursive: boolean = false
+): Promise<Content> {
   const cacheKey = `${recursive}:${entry.path}`;
   if (cacheStore[cacheKey]) {
     return cacheStore[cacheKey];
   }
-  logger.info({ path: entry.path }, 'reading');
+  cacheStore[cacheKey] = await readContent(entry, recursive);
+  return cacheStore[cacheKey];
+}
+
+export async function readContent(entry: FSEntry, recursive: boolean = false): Promise<Content> {
+  logger.info({ path: entry.path }, 'reading file');
   const content = await readEntryContent(entry);
   const chain = new ProcessorChain(...processors.map((p) => p()));
   const html = await chain.parse(content);
@@ -73,7 +81,5 @@ export async function readContent(entry: FSEntry, recursive: boolean = false): P
     ...chain.meta
   };
   const pages = entry.stats.isDirectory() ? await listContent(entry.path, recursive) : [];
-  const re = { html, meta, pages };
-  cacheStore[cacheKey] = re;
-  return re;
+  return { html, meta, pages };
 }
