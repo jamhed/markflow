@@ -2,18 +2,19 @@ import * as fs from 'fs/promises';
 import Path from 'path';
 import git, { type ReadCommitResult } from 'isomorphic-git';
 import logger from './logger.js';
-import type { FileMeta } from './meta.js';
+import type { FolderEntryMeta } from './meta.js';
+import type { FSEntry } from './files.js';
 
 function warnError(e: Error, message: string) {
   logger.warn({ msg: message, error: e.name, message: e.message });
 }
 
-export async function getGitMeta(fileName: string) {
-  const path = Path.dirname(fileName);
-  const meta: FileMeta = { file: fileName, path };
+export async function getGitMeta(entry: FSEntry) {
+  const path = Path.dirname(entry.path);
+  const meta: FolderEntryMeta = { name: entry.path, path, isFolder: entry.stats.isDirectory() };
   let commits: ReadCommitResult[];
   try {
-    commits = await git.log({ fs, dir: '.', filepath: fileName });
+    commits = await git.log({ fs, dir: '.', filepath: entry.path });
   } catch (e: unknown) {
     warnError(e as Error, 'error getting git info');
     return meta;

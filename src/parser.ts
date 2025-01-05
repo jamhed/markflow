@@ -1,68 +1,40 @@
-import * as fs from 'fs/promises';
 import Path, { join } from 'path';
 
-import { CodeProcessor } from './code.js';
-import { getFileMeta, getFiles, getFolders, makeSlug } from './files.js';
+import { listFolder, makeSlug, readEntryContent, type FSEntry } from './files.js';
 import { getGitMeta } from './git.js';
-import { createLinker } from './links.js';
-import logger from './logger.js';
-import { MetaProcessor, type FolderPart, type DocumentMeta } from './meta.js';
-import { ProcessorChain, type Processor } from './processor.js';
+import { MetaProcessor, type PathPart, type DocumentMeta } from './meta.js';
+import { ProcessorChain } from './processor.js';
+import { type Stats } from 'fs';
+import { CodeProcessor } from './code.js';
+
+export interface ContentMeta extends DocumentMeta {
+  [key: string]: any;
+}
 
 export interface Content {
   html: string;
-  meta: Partial<DocumentMeta>;
+  meta: ContentMeta;
+  pages: Content[];
 }
 
-const mapper = (page: any) => page.meta.created_ts;
+const createdTs = (page: any) => page.meta.created_ts;
 
-export async function listPages(path: string, recursive: boolean = false) {
-  const filteredPaths = (await getFiles(path, recursive))
-    .filter((file) => file.endsWith('.md'))
-    .filter((file) => !Path.basename(file).startsWith('_'));
-  const pages = await Promise.all(filteredPaths.map(async (file) => await readMeta(file)));
-  return pages.sort((a, b) => mapper(b) - mapper(a)).filter((page) => !page.meta.skip);
-}
-
-export async function listFolders(path: string) {
-  const folderPaths = await getFolders(path);
-  const folders = await Promise.all(
-    folderPaths.map(async (folder) => await getFolderMeta(path, folder))
-  );
-  return folders.filter((folder) => !folder.skip);
-}
-
-export const makeFolderParts = (slug: string): FolderPart[] => {
+export const makePathParts = (slug: string): PathPart[] => {
   const parts = slug.split('/');
   const re = [];
-  let folder = '/';
-  for (const part of parts) {
-    folder = join(folder, part);
-    re.push({ part, folder });
+  let path = '/';
+  for (const name of parts) {
+    path = join(path, name);
+    re.push({ name, path });
   }
   return re;
 };
 
-export async function getFolderMeta(path: string, folder: string) {
-  let meta: Partial<DocumentMeta> = {};
-  try {
-    const re = await readMeta(Path.join(path, folder, '_index.md'));
-    meta = re.meta;
-  } catch (e) {
-    logger.error(e, 'error reading folder meta');
-  }
-  const fullPath = Path.join(path, folder);
+function filterEntryStats(stats: Stats) {
   return {
-    ...{ title: folder, folder, path: fullPath },
-    ...meta,
-    ...{
-      parts: makeFolderParts(
-        fullPath
-          .replace(/^pages/, '')
-          .replace(/^\//, '')
-          .replace(/\/$/, '')
-      )
-    }
+    isFolder: stats.isDirectory(),
+    created_ts: Math.floor(stats.ctime.getTime() / 1000),
+    created: stats.ctime
   };
 }
 
@@ -72,26 +44,26 @@ export function addProcessor(p: any) {
   processors.push(p);
 }
 
-export async function parser(fileName: string, processors: Processor[] = []): Promise<Content> {
-  const content = await fs.readFile(fileName, 'utf8');
-  const chain = new ProcessorChain(...processors).use(createLinker(Path.dirname(fileName)));
+export async function listContent(path: string, recursive: boolean = false) {
+  const filteredPaths = (await listFolder(path, recursive))
+    .filter((entry) => entry.path.endsWith('.md') || entry.stats.isDirectory())
+    .filter((entry) => !Path.basename(entry.path).startsWith('_'));
+  const pages = await Promise.all(filteredPaths.map(async (entry) => await readContent(entry)));
+  return pages.sort((a, b) => createdTs(b) - createdTs(a)).filter((page) => !page.meta.skip);
+}
+
+export async function readContent(entry: FSEntry, recursive: boolean = false): Promise<Content> {
+  const content = await readEntryContent(entry);
+  const chain = new ProcessorChain(...processors.map((p) => p()));
   const html = await chain.parse(content);
-  const slug = makeSlug(fileName, 'pages');
-  const fileMeta = {
-    ...(await getFileMeta(fileName)),
-    ...(await getGitMeta(fileName)),
-    ...{ slug }
+  const slug = makeSlug(entry.path, 'pages');
+  const meta = {
+    ...filterEntryStats(entry.stats),
+    ...(await getGitMeta(entry)),
+    ...{ slug },
+    parts: makePathParts(slug),
+    ...chain.meta
   };
-  return { html, meta: { parts: makeFolderParts(slug), ...fileMeta, ...chain.meta } };
-}
-
-export async function readMeta(fileName: string) {
-  return parser(fileName, [new MetaProcessor()]);
-}
-
-export async function parseMarkdown(fileName: string) {
-  return parser(
-    fileName,
-    processors.map((p) => p())
-  );
+  const pages = entry.stats.isDirectory() ? await listContent(entry.path, recursive) : [];
+  return { html, meta, pages };
 }

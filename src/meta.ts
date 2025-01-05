@@ -2,9 +2,10 @@ import { load } from 'js-yaml';
 import { type Token, type Tokens } from 'marked';
 import { Processor, type Dispatch } from './processor.js';
 
-export interface FileMeta {
-  file: string;
+export interface FolderEntryMeta {
+  name: string;
   path: string;
+  isFolder: boolean;
   slug?: string;
   created?: string | Date;
   created_ts?: number;
@@ -13,16 +14,16 @@ export interface FileMeta {
   modified_ts?: number;
 }
 
-export interface FolderPart {
-  part: string;
-  folder: string;
+export interface PathPart {
+  name: string;
+  path: string;
 }
 
-export interface DocumentMeta extends FileMeta {
+export interface DocumentMeta extends FolderEntryMeta {
   title?: string;
   skip?: boolean;
   hero?: boolean;
-  parts?: FolderPart[];
+  parts?: PathPart[];
   description?: string;
 }
 

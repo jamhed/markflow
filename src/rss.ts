@@ -1,16 +1,18 @@
 import { Feed } from 'feed';
 import * as fs from 'fs/promises';
 import { SitemapStream, streamToPromise } from 'sitemap';
-import { getFolderMeta } from './parser.js';
+import { readContent } from './parser.js';
+import { getEntry } from './files.js';
 
 export const makeFeed = async (baseUrl: string, entryFile: string): Promise<Feed> => {
-  const rootMeta = await getFolderMeta('pages', '');
+  const entry = await getEntry('pages');
+  const root = await readContent(entry);
 
   const feed = new Feed({
     id: baseUrl,
-    title: rootMeta.title,
+    title: root.meta.title || root.meta.name,
     link: baseUrl,
-    description: rootMeta.description,
+    description: root.meta.description,
     copyright: 'All rights reserved'
   });
   const re = await fs.readFile(entryFile, 'utf8');
