@@ -47,28 +47,44 @@ export function addProcessor(p: any) {
   processors.push(p);
 }
 
-export async function listContent(path: string, recursive: boolean = false) {
-  const filteredPaths = (await listFolder(path, recursive))
-    .filter((entry) => entry.path.endsWith('.md') || entry.stats.isDirectory())
-    .filter((entry) => !Path.basename(entry.path).startsWith('_'));
-  const pages = await Promise.all(filteredPaths.map(async (entry) => await readContent(entry)));
-  return pages.sort((a, b) => createdTs(b) - createdTs(a)).filter((page) => !page.meta.skip);
-}
-
-export async function readContentCached(
-  entry: FSEntry,
-  recursive: boolean = false
-): Promise<Content> {
-  const cacheKey = `${recursive}:${entry.path}`;
+export async function readContentCached(entry: FSEntry): Promise<Content> {
+  const cacheKey = entry.path;
   if (cacheStore[cacheKey]) {
     return cacheStore[cacheKey];
   }
-  cacheStore[cacheKey] = await readContent(entry, recursive);
+  cacheStore[cacheKey] = await readContent(entry);
   return cacheStore[cacheKey];
 }
 
-export async function readContent(entry: FSEntry, recursive: boolean = false): Promise<Content> {
-  logger.info({ path: entry.path }, 'reading file');
+export function flattenPages(entries: Content[]): Content[] {
+  const re: Content[] = [];
+  for (const entry of entries) {
+    re.push(entry);
+    for (const page of entry.pages) {
+      re.push(page);
+      re.push(...flattenPages(page.pages));
+    }
+  }
+  return re;
+}
+
+export async function listContent(path: string, deep: boolean = false, recurse: boolean = false) {
+  logger.info({ path }, 'listing content');
+  const filteredPaths = (await listFolder(path))
+    .filter((entry) => entry.path.endsWith('.md') || entry.stats.isDirectory())
+    .filter((entry) => !Path.basename(entry.path).startsWith('_'));
+  const pages = await Promise.all(
+    filteredPaths.map(async (entry) => await readContent(entry, deep, recurse))
+  );
+  return pages.sort((a, b) => createdTs(b) - createdTs(a)).filter((page) => !page.meta.skip);
+}
+
+export async function readContent(
+  entry: FSEntry,
+  deep: boolean = false,
+  recurse: boolean = true
+): Promise<Content> {
+  logger.info({ path: entry.path }, 'reading content');
   const content = await readEntryContent(entry);
   const chain = new ProcessorChain(...processors.map((p) => p()));
   const html = await chain.parse(content);
@@ -80,6 +96,9 @@ export async function readContent(entry: FSEntry, recursive: boolean = false): P
     parts: makePathParts(slug),
     ...chain.meta
   };
-  const pages = entry.stats.isDirectory() ? await listContent(entry.path, recursive) : [];
+  const pages =
+    (recurse || deep) && entry.stats.isDirectory()
+      ? await listContent(entry.path, deep, false)
+      : [];
   return { html, meta, pages };
 }
