@@ -6,12 +6,12 @@ import { getFileMeta, getFiles, getFolders, makeSlug } from './files.js';
 import { getGitMeta } from './git.js';
 import { createLinker } from './links.js';
 import logger from './logger.js';
-import { MetaProcessor, type FolderPart, type Meta } from './meta.js';
+import { MetaProcessor, type FolderPart, type DocumentMeta } from './meta.js';
 import { ProcessorChain, type Processor } from './processor.js';
 
 export interface Content {
   html: string;
-  meta: Partial<Meta>;
+  meta: Partial<DocumentMeta>;
 }
 
 const mapper = (page: any) => page.meta.created_ts;
@@ -44,7 +44,7 @@ export const makeFolderParts = (slug: string): FolderPart[] => {
 };
 
 export async function getFolderMeta(path: string, folder: string) {
-  let meta: Partial<Meta> = {};
+  let meta: Partial<DocumentMeta> = {};
   try {
     const re = await readMeta(Path.join(path, folder, '_index.md'));
     meta = re.meta;

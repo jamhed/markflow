@@ -18,13 +18,12 @@ export interface FolderPart {
   folder: string;
 }
 
-export interface Meta extends FileMeta {
+export interface DocumentMeta extends FileMeta {
   title?: string;
   skip?: boolean;
   hero?: boolean;
   parts?: FolderPart[];
   description?: string;
-  folder?: boolean;
 }
 
 export interface Options {
@@ -44,7 +43,7 @@ function textify(token: Tokens.Generic) {
 export class MetaProcessor extends Processor {
   headings: number;
   paragraphs: number;
-  meta: Partial<Meta>;
+  meta: Partial<DocumentMeta>;
   constructor(private options: Options = {}) {
     super();
     this.headings = 0;
@@ -66,7 +65,7 @@ export class MetaProcessor extends Processor {
     this.paragraphs++;
     if (this.paragraphs == 1) {
       try {
-        const meta = load(token.raw) as Partial<Meta>;
+        const meta = load(token.raw) as Partial<DocumentMeta>;
         if (typeof meta === 'string') {
           this.meta.description = await this.toString(token);
         }

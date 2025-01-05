@@ -1,7 +1,7 @@
 import * as fs from 'fs/promises';
-import type { Meta } from './meta.js';
+import type { DocumentMeta } from './meta.js';
 
-export const writeFeedEntry = async (url: URL, meta: Partial<Meta>) => {
+export const writeFeedEntry = async (url: URL, meta: Partial<DocumentMeta>) => {
   fs.appendFile(
     '.svelte-kit/output/client/sitemap.json',
     JSON.stringify({
