@@ -38,6 +38,7 @@ Markdown file header allows overriding metadata:
 
 ```md
 # Title
+
 field: value
 
 Description
