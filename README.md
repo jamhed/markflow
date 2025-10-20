@@ -56,6 +56,7 @@ This project uses [semantic-release](https://semantic-release.gitbook.io/) for a
 - `docs:`, `chore:`, `refactor:` → no release
 
 Examples:
+
 ```
 fix: resolve parsing error in meta extraction
 feat: add RSS feed generation support
