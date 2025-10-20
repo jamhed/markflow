@@ -1,6 +1,21 @@
 {
 	"name": "markflow-svelte",
+	"version": "0.0.0",
+	"description": "Markdown content processing toolkit, extendable with custom processors and directives",
+	"author": "jamhed",
 	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/jamhed/markflow.git"
+	},
+	"keywords": [
+		"markdown",
+		"svelte",
+		"content",
+		"processing",
+		"git",
+		"marked"
+	],
 	"packageManager": "pnpm@10.18.3",
 	"scripts": {
 		"build": "npx tsc",
@@ -37,6 +52,7 @@
 		"svelte-check": "^4.3.3"
 	},
 	"devDependencies": {
+		"@eslint/js": "^9.38.0",
 		"@types/js-yaml": "^4.0.9",
 		"@types/node": "^24.9.0",
 		"eslint": "^9.38.0",
