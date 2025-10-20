@@ -11,11 +11,13 @@ None - All changes are backwards compatible.
 ## Features
 
 ### New Modules
+
 - **ContentCache class** (`src/cache.ts`): Generic cache implementation with TTL support for better memory management
 - **Constants module** (`src/constants.ts`): Centralized configuration constants
 - **Public API exports**: Added `clearContentCache()` function for manual cache invalidation
 
 ### Type Safety Improvements
+
 - Removed all `any` types throughout the codebase
 - Added generic type parameter to `loadJSON<T>()` for type-safe JSON parsing
 - Implemented proper type guards with null checks
@@ -25,10 +27,12 @@ None - All changes are backwards compatible.
 ## Bug Fixes
 
 ### Critical
+
 - **Fixed missing `await`** in `writeFeedEntry()` that could cause data loss during sitemap generation
 - **Fixed recursive array operations** in `flattenPages()` that could cause stack overflow on deeply nested content
 
 ### Error Handling
+
 - Replaced silent error swallowing with proper error propagation
 - Added `Promise.allSettled()` for resilient parallel operations in `listContent()`
 - Improved error messages with contextual information
@@ -42,11 +46,13 @@ None - All changes are backwards compatible.
 ## Code Quality
 
 ### Documentation
+
 - Added comprehensive JSDoc comments to all public APIs
 - Documented all parameters, return types, and examples
 - Added inline comments explaining complex logic
 
 ### Code Style
+
 - Standardized naming conventions throughout (camelCase for TypeScript)
 - Replaced unclear variable names:
   - `re` → `result`
@@ -57,6 +63,7 @@ None - All changes are backwards compatible.
 - Applied consistent formatting with Prettier
 
 ### Architecture
+
 - Replaced global mutable state with dependency injection pattern
 - Implemented proper class encapsulation with private/protected modifiers
 - Added type-safe dynamic method dispatch in processor system
@@ -64,6 +71,7 @@ None - All changes are backwards compatible.
 ## Refactoring
 
 ### Files Refactored
+
 - `src/processor.ts`: Removed `any` types, added comprehensive documentation
 - `src/parser.ts`: Implemented cache system, improved error handling
 - `src/meta.ts`: Better text extraction, improved naming
@@ -77,13 +85,16 @@ None - All changes are backwards compatible.
 ## Chores
 
 ### Dependency Updates
+
 All dependencies updated to latest versions using `npm-check-updates`:
 
 #### Major Updates
+
 - `shiki`: ^1.26.1 → **^3.13.0** (major)
 - `vite`: ^6.0.7 → **^7.1.11** (major)
 
 #### Minor Updates
+
 - `@types/node`: ^22.10.5 → ^24.9.0
 - `eslint`: ^9.17.0 → ^9.38.0
 - `eslint-config-prettier`: ^9.1.0 → ^10.1.8
@@ -107,12 +118,14 @@ All dependencies updated to latest versions using `npm-check-updates`:
 ### Configuration Updates
 
 #### `tsconfig.json`
+
 - Added `noUnusedParameters`, `noImplicitReturns`, `noFallthroughCasesInSwitch`
 - Enabled `sourceMap` and `declarationMap` for better developer experience
 - Changed module system to `NodeNext` for better Node.js compatibility
 - Improved compiler strictness
 
 #### `eslint.config.js`
+
 - Added rule to allow underscore-prefixed unused parameters (`_param`)
 - Maintains code quality while supporting idiomatic patterns
 
@@ -128,6 +141,7 @@ All dependencies updated to latest versions using `npm-check-updates`:
 ### For Consumers of This Package
 
 #### Updated Exports
+
 ```typescript
 // New exports available
 import { ContentCache, clearContentCache } from 'markflow-svelte';
@@ -135,6 +149,7 @@ import { DEFAULT_PAGES_DIR, DEFAULT_INDEX_FILE } from 'markflow-svelte';
 ```
 
 #### Interface Changes (Non-Breaking)
+
 The following interface properties have been renamed but remain backwards compatible through spreading:
 
 ```typescript
@@ -146,6 +161,7 @@ const timestamp = meta.createdTs;
 ```
 
 #### Cache Management
+
 ```typescript
 // Clear cache when needed
 import { clearContentCache } from 'markflow-svelte';
@@ -157,6 +173,7 @@ clearContentCache();
 ### For Contributors
 
 #### Code Style
+
 - Use camelCase for all TypeScript identifiers
 - Prefix unused parameters with underscore: `_param`
 - Add JSDoc comments to all public APIs
@@ -164,6 +181,7 @@ clearContentCache();
 - Prefer `??` over `||` for default values
 
 #### Type Safety
+
 - Never use `any` - use `unknown` and type guards instead
 - Add explicit return types to public functions
 - Use generics for reusable type-safe code
