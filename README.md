@@ -45,3 +45,19 @@ Description
 ```
 
 The first header goes into `title`, and the first paragraph into `description` fields.
+
+## Contributing
+
+This project uses [semantic-release](https://semantic-release.gitbook.io/) for automated versioning and publishing. Follow [Conventional Commits](https://www.conventionalcommits.org/):
+
+- `fix: ...` → patch release (1.0.x)
+- `feat: ...` → minor release (1.x.0)
+- `feat!: ...` or `BREAKING CHANGE:` → major release (x.0.0)
+- `docs:`, `chore:`, `refactor:` → no release
+
+Examples:
+```
+fix: resolve parsing error in meta extraction
+feat: add RSS feed generation support
+feat!: change processor API signature
+```
